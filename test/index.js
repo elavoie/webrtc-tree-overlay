@@ -111,7 +111,7 @@ tape('Maximum Degree Property', function (t) {
   }
 
   var MAX_DEGREE = 2
-  var NB_NODES = 30
+  var NB_NODES = 10
   t.timeoutAfter(NB_NODES * 1000 /* MS */)
   var startTime = Date.now()
   var root = new Node(bootstrap, { maxDegree: MAX_DEGREE, peerOpts: { wrtc: wrtc } }).becomeRoot(secret)
@@ -145,15 +145,15 @@ tape('Maximum Degree Property', function (t) {
       log('all nodes connected')
       t.equal(parentConnections, NB_NODES)
 
-      log('root has ' + root.children.length + ' children, ' +
+      log('root has ' + root.childrenNb + ' children, ' +
         root.candidateNb + ' candidate(s), ' +
         root._storedRequests.length + ' stored request(s)')
 
       for (var i = 0; i < NB_NODES; ++i) {
-        log('node(' + nodes[i].id + ') has ' + nodes[i].children.length + ' children and ' +
+        log('node(' + nodes[i].id + ') has ' + nodes[i].childrenNb + ' children and ' +
           nodes[i].candidateNb + ' candidate(s), ' +
           nodes[i]._storedRequests.length + ' stored request(s)')
-        t.ok(nodes[i].children.length <= MAX_DEGREE)
+        t.ok(nodes[i].childrenNb <= MAX_DEGREE)
       }
 
       log('closing root and nodes')

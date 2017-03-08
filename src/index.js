@@ -78,7 +78,8 @@ function Node (bootstrap, opts) {
   this.id = randombytes(4).hexSlice()
   this._log = debug('webrtc-tree-overlay:node(' + this.id + ')')
   this.parent = null
-  this.children = []
+  this.children = {}
+  this.childrenNb = 0
   this.candidates = {}
   this.candidateNb = 0
   this.peerOpts = opts.peerOpts || {}
@@ -102,6 +103,11 @@ Node.prototype.join = function () {
     null,
     this.bootstrap.connect(null, { peerOpts: this.peerOpts }))
 
+  var timeout = setTimeout(function () {
+    self.parent.destroy()
+    self.parent = null
+  }, self.REQUEST_TIMEOUT_IN_MS)
+
   this.parent
     .on('join-request', this._handleJoinRequest.bind(this))
     .on('data', function (data) {
@@ -109,6 +115,7 @@ Node.prototype.join = function () {
     })
     .on('connect', function () {
       self._log('connected to parent')
+      clearTimeout(timeout)
       self.emit('parent-connect', self.parent)
     })
     .on('close', function () {
@@ -128,14 +135,14 @@ Node.prototype._handleJoinRequest = function (req) {
   var self = this
   self._log('_handleJoinRequest(' + req.origin + ')')
   self._log(
-    'childrenNb: ' + this.children.length +
+    'childrenNb: ' + this.childrenNb +
     ', candidateNb: ' + this.candidateNb +
     ', maxDegree: ' + this.maxDegree)
   if (this.candidates.hasOwnProperty(req.origin)) {
     self._log('forwarding request to one of our candidates (' + req.origin.slice(0, 4) + ')')
     // A candidate is sending us more signal information
     this.candidates[req.origin]._socket.signal(req.signal)
-  } else if (this.children.length + this.candidateNb < this.maxDegree) {
+  } else if (this.childrenNb + this.candidateNb < this.maxDegree) {
     self._log('creating a new candidate (' + req.origin + ')')
     // We have connections available for a new candidate
     this.createCandidate(req)
@@ -143,6 +150,36 @@ Node.prototype._handleJoinRequest = function (req) {
     // Let one of our children handle this candidate
     this._delegate(req)
   }
+}
+
+Node.prototype.addChild = function (child) {
+  this.childrenNb++
+
+  var childIdx = null
+  for (var i = 0; i < this.maxDegree; ++i) {
+    if (!this.children[i]) {
+      childIdx = i
+      this.children[i] = child
+      break
+    }
+  }
+
+  this.removeCandidate(child.id)
+  return childIdx
+}
+
+Node.prototype.removeChild = function (child) {
+  this.childrenNb--
+
+  var childIdx = null
+  for (var i = 0; i < this.maxDegree; ++i) {
+    if (this.children[i] === child) {
+      childIdx = i
+      delete this.children[i]
+    }
+  }
+
+  return childIdx
 }
 
 Node.prototype.createCandidate = function (req) {
@@ -155,18 +192,17 @@ Node.prototype.createCandidate = function (req) {
   )
     .on('connect', function () {
       self._log('child (' + JSON.stringify(child.id) + ') connected')
-      self.children.push(child)
-      self.removeCandidate(child.id)
-      self.emit('child-connect', child)
+      clearTimeout(timeout)
+      var childIdx = self.addChild(child)
 
       // Process stored requests that belong to this child
-      var childIdx = self.children.length - 1
       var storedRequests = self._storedRequests[childIdx].slice(0)
       self._storedRequests[childIdx] = []
 
       storedRequests.forEach(function (req) {
         child._sendJoinRequest(req)
       })
+      self.emit('child-connect', child)
     })
     .on('data', function (data) {
       self.emit('data', data, child, false)
@@ -183,10 +219,15 @@ Node.prototype.createCandidate = function (req) {
     .on('error', function (err) {
       self._log('child (' + JSON.stringify(child.id) + ') error: ')
       self._log(err)
-      self.removeChild(child.id)
+      self.removeChild(child)
       self.removeCandidate(child.id)
       self.emit('child-error', child, err)
     })
+
+  var timeout = setTimeout(function () {
+    child.destroy()
+    self.removeCandidate(child.id)
+  }, self.REQUEST_TIMEOUT_IN_MS)
 
   this.addCandidate(child)
   return child
@@ -218,19 +259,6 @@ Node.prototype.removeCandidate = function (id) {
   }
 }
 
-Node.prototype.removeChild = function (id) {
-  var self = this
-  self._log('removing child (' + id + ')')
-
-  var idx = this.findChild(id)
-  if (idx === null) {
-    return
-  }
-
-  this.children.splice(idx, 1)
-  self._log('removed child (' + id + ') at index ' + idx)
-}
-
 Node.prototype._delegateIndex = function (req) {
   // Use the first bytes of the origin address to deterministically
   // choose one of our children, regardless of whether it is connected
@@ -251,15 +279,6 @@ Node.prototype._delegate = function (req) {
     // has joined
     this._storedRequests[childIndex].push(req)
   }
-}
-
-Node.prototype.findChild = function (id) {
-  for (var i = 0; i < this.children.length; ++i) {
-    if (this.children[i].id === id) {
-      return i
-    }
-  }
-  return null
 }
 
 Node.prototype.becomeRoot = function (secret) {
