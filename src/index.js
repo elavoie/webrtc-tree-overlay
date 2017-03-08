@@ -126,6 +126,7 @@ Node.prototype.join = function () {
     .on('error', function (err) {
       self._log('parent error: ' + err)
       self.emit('parent-error', self.parent, err)
+      self.parent = null
     })
 
   return this
