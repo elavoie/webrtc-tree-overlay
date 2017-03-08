@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/elavoie/webrtc-tree-overlay.svg?branch=master)](https://travis-ci.org/elavoie/webrtc-tree-overlay)
+
 # webrtc-tree-overlay
 
 Dynamically maintain a tree overlay topology from nodes connected by WebRTC as
