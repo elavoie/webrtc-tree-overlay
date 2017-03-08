@@ -1,0 +1,28 @@
+language: node_js
+
+node_js:
+  - "node"
+  - "7"
+  - "6"
+  - "5"
+  - "4"
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+env:
+  global:
+  - CXX=g++-4.8
+
+branches:
+  only:
+    - master
+notifications:
+  email:
+    recipients:
+      - github@ericklavoie.com
+    on_success: change
+    on_failure: always
