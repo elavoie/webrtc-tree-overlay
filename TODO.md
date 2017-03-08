@@ -1,2 +1,1 @@
 - Prefix private properties with '_'
-- Handle timeouts on candidates never connecting
