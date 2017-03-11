@@ -53,16 +53,26 @@ client.
 
 {
   peerOpts: {},
-  maxDegree: 10
+  maxDegree: 10,
+  requestTimeoutInMs: 30 * 1000
 }
 
 where 
   - `opts.peerOpts` are options passed to [SimplePeer](https://github.com/feross/simple-peer)
   - `opts.maxDegree` is the maximum number of children a node will keep
+  - `opts.requestTimeoutInMs` the upper bound on the time a candidate will be considered for joining. If the connection handshake has not been successfully before the end of the interval, the candidate is rejected.
 
 ## Node.children
 
-The current list of children channels.
+The current dictionary of children channels.
+
+## Node.childrenNb
+
+The current number of children.
+
+## Node.maxDegree
+
+The maximum number of children and candidates that are kept. If a join request arrives while it will either be passed to one of the children, or kept until one a candidate has become a connected child.
 
 ## Node.parent
 
@@ -112,16 +122,40 @@ When then child *channel* has failed because of *err*.
 
 ## Channel
 
-Abstracts the underlying WebRTC channel to multiplex the tree join protocol with application-level messages. Lightweight messages can be sent on the topology channels. However, for any heavy data traffic a dedicated SimplePeer connection should be established, possibly through the channel.
+Abstracts the underlying WebRTC channel to multiplex the tree join protocol with application-level messages. Lightweight messages can be sent on the topology on those channels. However, for any heavy data traffic a dedicated SimplePeer connection should be established. The channel can be used for that purpose.
 
-The constructor is only called internally by the Node.
+The constructor is called internally by a Node during the joining process and it is not available publicly.
 
-### Channel.send(data)
+### Channel.id
 
-Sends *data* to the neighbour through the channel.
+Identifier of the channel, different from the Node.id on either side. From the point of view of a child, the id of its parent is always null. From the point of view of a parent, each child has a non-null unique id.
 
 ### Channel.destroy()
 
+Closes the channel.
+
+### Channel.isParent()
+
+Return true if the channel is used to communicate with the Node's parent.
+
+### Channel.send(data)
+
+Sends *data* to the neighbour (parent or child) through the channel.
+
+
+### Channel.on('close', function ())
+
+Fires when the channel has closed.
+
 ### Channel.on('data', function (data))
 
-When data has been received.
+Fires when data has arrived.
+
+### Channel.on('error', function (err))
+
+Fires an error aborted the channel.
+
+### Channel.on('join-request', function (req))
+
+Used internally. Fires when a join request has arrived. An application should not need to bother with those. 
+

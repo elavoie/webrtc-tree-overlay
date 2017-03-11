@@ -26,7 +26,7 @@ function Channel (id, socket) {
       }
     })
     .on('connect', function () {
-      self.emit('connect')
+      self.emit('connect', self)
     })
     .on('close', function () {
       log('closing')
@@ -80,11 +80,11 @@ function Node (bootstrap, opts) {
   this.parent = null
   this.children = {}
   this.childrenNb = 0
-  this.candidates = {}
-  this.candidateNb = 0
+  this._candidates = {}
+  this._candidateNb = 0
   this.peerOpts = opts.peerOpts || {}
   this.maxDegree = opts.maxDegree || 10
-  this.REQUEST_TIMEOUT_IN_MS = opts.requestTimeoutInMs || 30 * 1000
+  this._REQUEST_TIMEOUT_IN_MS = opts.requestTimeoutInMs || 30 * 1000
 
   this._storedRequests = {}
   for (var i = 0; i < this.maxDegree; i++) {
@@ -106,17 +106,17 @@ Node.prototype.join = function () {
   var timeout = setTimeout(function () {
     self.parent.destroy()
     self.parent = null
-  }, self.REQUEST_TIMEOUT_IN_MS)
+  }, self._REQUEST_TIMEOUT_IN_MS)
 
   this.parent
     .on('join-request', this._handleJoinRequest.bind(this))
     .on('data', function (data) {
-      self.emit('data', self.parent, true)
+      self.emit('data', data, self.parent, true)
     })
     .on('connect', function () {
       self._log('connected to parent')
-      clearTimeout(timeout)
       self.emit('parent-connect', self.parent)
+      clearTimeout(timeout)
     })
     .on('close', function () {
       self._log('parent closed')
@@ -137,13 +137,13 @@ Node.prototype._handleJoinRequest = function (req) {
   self._log('_handleJoinRequest(' + req.origin + ')')
   self._log(
     'childrenNb: ' + this.childrenNb +
-    ', candidateNb: ' + this.candidateNb +
+    ', _candidateNb: ' + this._candidateNb +
     ', maxDegree: ' + this.maxDegree)
-  if (this.candidates.hasOwnProperty(req.origin)) {
+  if (this._candidates.hasOwnProperty(req.origin)) {
     self._log('forwarding request to one of our candidates (' + req.origin.slice(0, 4) + ')')
     // A candidate is sending us more signal information
-    this.candidates[req.origin]._socket.signal(req.signal)
-  } else if (this.childrenNb + this.candidateNb < this.maxDegree) {
+    this._candidates[req.origin]._socket.signal(req.signal)
+  } else if (this.childrenNb + this._candidateNb < this.maxDegree) {
     self._log('creating a new candidate (' + req.origin + ')')
     // We have connections available for a new candidate
     this.createCandidate(req)
@@ -153,7 +153,7 @@ Node.prototype._handleJoinRequest = function (req) {
   }
 }
 
-Node.prototype.addChild = function (child) {
+Node.prototype._addChild = function (child) {
   this.childrenNb++
 
   var childIdx = null
@@ -165,11 +165,11 @@ Node.prototype.addChild = function (child) {
     }
   }
 
-  this.removeCandidate(child.id)
+  this._removeCandidate(child.id)
   return childIdx
 }
 
-Node.prototype.removeChild = function (child) {
+Node.prototype._removeChild = function (child) {
   this.childrenNb--
 
   var childIdx = null
@@ -194,7 +194,7 @@ Node.prototype.createCandidate = function (req) {
     .on('connect', function () {
       self._log('child (' + JSON.stringify(child.id) + ') connected')
       clearTimeout(timeout)
-      var childIdx = self.addChild(child)
+      var childIdx = self._addChild(child)
 
       // Process stored requests that belong to this child
       var storedRequests = self._storedRequests[childIdx].slice(0)
@@ -213,47 +213,47 @@ Node.prototype.createCandidate = function (req) {
     })
     .on('close', function () {
       self._log('child (' + JSON.stringify(child.id) + ') closed')
-      self.removeChild(child)
-      self.removeCandidate(child.id)
+      self._removeChild(child)
+      self._removeCandidate(child.id)
       self.emit('child-close', child)
     })
     .on('error', function (err) {
       self._log('child (' + JSON.stringify(child.id) + ') error: ')
       self._log(err)
-      self.removeChild(child)
-      self.removeCandidate(child.id)
+      self._removeChild(child)
+      self._removeCandidate(child.id)
       self.emit('child-error', child, err)
     })
 
   var timeout = setTimeout(function () {
     child.destroy()
-    self.removeCandidate(child.id)
-  }, self.REQUEST_TIMEOUT_IN_MS)
+    self._removeCandidate(child.id)
+  }, self._REQUEST_TIMEOUT_IN_MS)
 
-  this.addCandidate(child)
+  this._addCandidate(child)
   return child
 }
 
-Node.prototype.addCandidate = function (peer) {
+Node.prototype._addCandidate = function (peer) {
   var self = this
-  if (this.candidates.hasOwnProperty(peer.id)) {
-    if (this.candidates[peer.id] !== peer) {
+  if (this._candidates.hasOwnProperty(peer.id)) {
+    if (this._candidates[peer.id] !== peer) {
       throw new Error('Adding a different candidate with the same identifier as an existing one')
     } else {
       self._log('WARNING: re-adding the same candidate ' + peer.id)
     }
   } else {
     self._log('added candidate (' + peer.id + ')')
-    this.candidates[peer.id] = peer
-    this.candidateNb++
+    this._candidates[peer.id] = peer
+    this._candidateNb++
   }
 }
 
-Node.prototype.removeCandidate = function (id) {
+Node.prototype._removeCandidate = function (id) {
   var self = this
-  if (this.candidates.hasOwnProperty(id)) {
-    delete this.candidates[id]
-    this.candidateNb--
+  if (this._candidates.hasOwnProperty(id)) {
+    delete this._candidates[id]
+    this._candidateNb--
     self._log('removed candidate (' + id + ')')
   } else {
     self._log('candidate (' + id + ') not found, it may have been removed already')
@@ -306,11 +306,11 @@ Node.prototype.close = function () {
   }
   this.children = []
 
-  for (var c in this.candidates) {
-    this.candidates[c].destroy()
+  for (var c in this._candidates) {
+    this._candidates[c].destroy()
   }
-  this.candidates = {}
-  this.candidateNb = 0
+  this._candidates = {}
+  this._candidateNb = 0
 
   this.emit('close')
 }
