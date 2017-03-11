@@ -1,1 +1,0 @@
-- Prefix private properties with '_'
