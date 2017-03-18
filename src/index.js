@@ -1,6 +1,5 @@
 var EE = require('event-emitter')
 var debug = require('debug')
-var randombytes = require('randombytes')
 
 // Wraps the WebRTC socket inside a channel to encapsulate
 // the join-request protocol while allowing application-defined control
@@ -75,7 +74,7 @@ function Node (bootstrap, opts) {
 
   opts = opts || {}
 
-  this.id = randombytes(4).hexSlice()
+  this.id = (Math.floor(Math.random() * 1000000).toString() + '000000').slice(0, 6)
   this._log = debug('webrtc-tree-overlay:node(' + this.id + ')')
   this.parent = null
   this.children = {}
