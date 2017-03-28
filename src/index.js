@@ -169,6 +169,12 @@ Node.prototype._addChild = function (child) {
     }
   }
 
+  if (childIdx === null) {
+    this._log('children:')
+    this._log(this.children)
+    throw new Error('No space found for adding new child')
+  }
+
   this._removeCandidate(child.id)
   return childIdx
 }
