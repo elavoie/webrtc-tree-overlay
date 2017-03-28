@@ -34,7 +34,6 @@ function Channel (id, socket) {
     .on('error', function (err) {
       log(err.message)
       log(err.stack)
-      throw err
     })
 }
 EE(Channel.prototype)
