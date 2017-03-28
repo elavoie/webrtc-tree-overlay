@@ -112,7 +112,7 @@ tape('Maximum Degree Property', function (t) {
 
   var MAX_DEGREE = 2
   var NB_NODES = 10
-  t.timeoutAfter(NB_NODES * 1000 /* MS */)
+  t.timeoutAfter(NB_NODES * 2000 /* MS */)
   var startTime = Date.now()
   var root = new Node(bootstrap, { maxDegree: MAX_DEGREE, peerOpts: { wrtc: wrtc } }).becomeRoot(secret)
 

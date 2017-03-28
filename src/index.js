@@ -100,9 +100,15 @@ Node.prototype.join = function () {
 
   this.parent = new Channel(
     null,
-    this.bootstrap.connect(null, { peerOpts: this.peerOpts }))
+    this.bootstrap.connect(null, {
+      peerOpts: this.peerOpts,
+      cb: function () {
+        // Ignore boostrapping timeout, we use our own here
+      }
+    }))
 
   var timeout = setTimeout(function () {
+    self._log('connection to parent failed')
     self.parent.destroy()
     self.parent = null
   }, self._REQUEST_TIMEOUT_IN_MS)
@@ -225,6 +231,7 @@ Node.prototype.createCandidate = function (req) {
     })
 
   var timeout = setTimeout(function () {
+    self._log('connection to child(' + child.id + ') failed')
     child.destroy()
     self._removeCandidate(child.id)
   }, self._REQUEST_TIMEOUT_IN_MS)
