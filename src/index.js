@@ -2,13 +2,13 @@ var EE = require('event-emitter')
 var debug = require('debug')
 
 function hash (value) {
-  // Robert Jenkins' 32 bit integer hash function.
-  value = ((value + 0x7ed55d16) + (value << 12)) & 0xffffffff
-  value = ((value ^ 0xc761c23c) ^ (value >>> 19)) & 0xffffffff
-  value = ((value + 0x165667b1) + (value << 5)) & 0xffffffff
-  value = ((value + 0xd3a2646c) ^ (value << 9)) & 0xffffffff
-  value = ((value + 0xfd7046c5) + (value << 3)) & 0xffffffff
-  value = ((value ^ 0xb55a4f09) ^ (value >>> 16)) & 0xffffffff
+  // Robert Jenkins' 32 bit integer hash function, adapted to return 31-bit number
+  value = ((value + 0x7ed55d16) + (value << 12)) & 0x7fffffff
+  value = ((value ^ 0xc761c23c) ^ (value >>> 19)) & 0x7fffffff
+  value = ((value + 0x165667b1) + (value << 5)) & 0x7fffffff
+  value = ((value + 0xd3a2646c) ^ (value << 9)) & 0x7fffffff
+  value = ((value + 0xfd7046c5) + (value << 3)) & 0x7fffffff
+  value = ((value ^ 0xb55a4f09) ^ (value >>> 16)) & 0x7fffffff
   return value
 }
 
