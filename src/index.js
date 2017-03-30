@@ -1,6 +1,17 @@
 var EE = require('event-emitter')
 var debug = require('debug')
 
+function hash (value) {
+  // Robert Jenkins' 32 bit integer hash function.
+  value = ((value + 0x7ed55d16) + (value << 12)) & 0xffffffff
+  value = ((value ^ 0xc761c23c) ^ (value >>> 19)) & 0xffffffff
+  value = ((value + 0x165667b1) + (value << 5)) & 0xffffffff
+  value = ((value + 0xd3a2646c) ^ (value << 9)) & 0xffffffff
+  value = ((value + 0xfd7046c5) + (value << 3)) & 0xffffffff
+  value = ((value ^ 0xb55a4f09) ^ (value >>> 16)) & 0xffffffff
+  return value
+}
+
 // Wraps the WebRTC socket inside a channel to encapsulate
 // the join-request protocol while allowing application-defined control
 // protocols to be multiplexed
@@ -73,7 +84,7 @@ function Node (bootstrap, opts) {
 
   opts = opts || {}
 
-  this.id = (Math.floor(Math.random() * 1000000).toString() + '000000').slice(0, 6)
+  this.id = hash(Math.floor(Math.random() * 4294967296)).toString().slice(0, 6)
   this._log = debug('webrtc-tree-overlay:node(' + this.id + ')')
   this.parent = null
   this.children = {}
