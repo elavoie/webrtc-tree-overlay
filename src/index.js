@@ -290,7 +290,9 @@ Node.prototype._delegateIndex = function (req) {
   // id to derive the index of the child to use.
   var origin = Number.parseInt(req.origin.slice(0, 6), 16)
   var id = Number.parseInt(this.id)
-  return (origin ^ id) % this.maxDegree
+  var childIndex = (origin ^ id) % this.maxDegree
+  this._log('_delegateIndex: ' + childIndex)
+  return childIndex
 }
 
 Node.prototype._delegate = function (req) {
