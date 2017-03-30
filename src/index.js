@@ -272,10 +272,13 @@ Node.prototype._removeCandidate = function (id) {
 }
 
 Node.prototype._delegateIndex = function (req) {
-  // Use the first bytes of the origin address to deterministically
-  // choose one of our children, regardless of whether it is connected
-  // or not at the moment
-  return Number.parseInt(req.origin.slice(0, 6), 16) % this.maxDegree
+  // Deterministically choose one of our children, regardless of whether it is
+  // connected or not at the moment.
+  //
+  // We combine the first bytes of the origin address with the node
+  // id to derive the index of the child to use.
+  var origin = Number.parseInt(req.origin.slice(0, 6), 16)
+  return (origin ^ this.id) % this.maxDegree
 }
 
 Node.prototype._delegate = function (req) {
