@@ -1,16 +1,16 @@
 [ ] Fix bug:
-/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:205
-      var storedRequests = self._storedRequests[childIdx].slice(0)
-                                                         ^
 
-TypeError: Cannot read property 'slice' of undefined
-    at Channel.<anonymous> (/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:205:58)
-    at Channel.emit (/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/event-emitter/index.js:97:9)
-    at Peer.<anonymous> (/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:28:12)
+/home/elavoie/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:186      ]
+    throw new Error('No space found for adding new child')
+
+Error: No space found for adding new child
+    at Node._addChild (/home/elavoie/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:186:11)
+    at Channel.<anonymous> (/home/elavoie/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:218:27)
+    at Channel.emit (/home/elavoie/pando-computing/node_modules/event-emitter/index.js:97:9)
+    at Peer.<anonymous> (/home/elavoie/pando-computing/node_modules/webrtc-tree-overlay/src/index.js:39:12)
     at emitNone (events.js:91:20)
     at Peer.emit (events.js:185:7)
-    at /Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/simple-peer/index.js:603:10
-    at /Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/simple-peer/index.js:486:7
-    at _callRemote (/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/electron-webrtc/src/RTCPeerConnection.js:260:9)
-    at Daemon.daemon.once (/Users/erick/Documents/Recherche/Pando/pando-computing/node_modules/electron-webrtc/src/RTCPeerConnection.js:277:11)
-    at Object.onceWrapper (events.js:290:19)
+    at /home/elavoie/pando-computing/node_modules/simple-peer/index.js:603:10
+    at /home/elavoie/pando-computing/node_modules/simple-peer/index.js:486:7
+    at _callRemote (/home/elavoie/pando-computing/node_modules/electron-webrtc/src/RTCPeerConnection.js:260:9)
+    at Daemon.daemon.once (/home/elavoie/pando-computing/node_modules/electron-webrtc/src/RTCPeerConnection.js:277:11)
