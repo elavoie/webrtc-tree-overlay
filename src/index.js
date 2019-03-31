@@ -191,13 +191,13 @@ Node.prototype._addChild = function (child) {
 }
 
 Node.prototype._removeChild = function (child) {
-  this.childrenNb--
 
   var childIdx = null
   for (var i = 0; i < this.maxDegree; ++i) {
     if (this.children[i] === child) {
       childIdx = i
       delete this.children[i]
+      this.childrenNb--
     }
   }
 

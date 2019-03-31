@@ -1,6 +1,6 @@
 {
   "name": "webrtc-tree-overlay",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Dynamically maintain a tree overlay with WebRTC",
   "main": "src/index.js",
   "scripts": {
@@ -30,6 +30,6 @@
     "tape": "^4.6.3",
     "webrtc-bootstrap": "^2.1.2",
     "webrtc-bootstrap-server": "^1.0.1",
-    "wrtc": "0.0.61"
+    "wrtc": "^0.3.7"
   }
 }
