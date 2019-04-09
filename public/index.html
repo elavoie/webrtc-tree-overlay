@@ -24,7 +24,7 @@
   <script src='browsernode.js'></script>
   <script>
     localStorage.debug = 'webrtc-tree-overlay*'
-    browsernode(location.host, location.hash.slice(1))
+browsernode(location.host, location.hash.slice(1), location.origin.indexOf('https') > -1)
   </script>
 </body>
 </html>

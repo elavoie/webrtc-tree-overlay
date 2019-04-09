@@ -9,9 +9,9 @@ function log (s) {
   _log(s)
 }
 
-module.exports = function (host, origin) {
+module.exports = function (host, origin, secure) {
   log('connecting to ' + host + ' from ' + origin)
-  var node = new Node(new Client(host)).join()
+  var node = new Node(new Client(host, { secure: secure })).join()
 
   node.on('parent-connect', function (channel) {
     log('connected to root')
