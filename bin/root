@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+var argv = require('minimist')(process.argv)
+var Client = require('webrtc-bootstrap')
+var Node = require('..')
+var debug = require('debug')
+var log = debug('webrtc-tree-overlay:root')
+var wrtc = require('wrtc')
+var secret = argv.secret ? argv.secret : 'SECRET'
+var host = argv.host ? argv.host : 'genet.herokuapp.com'  
+
+log('connecting to ' + host)
+var root = new Node(new Client(host), { peerOpts: { wrtc: wrtc } }).becomeRoot(secret)
+
+root.on('child-connect', function (channel) {
+  log('root connected to child ' + channel.id)
+
+  channel.on('data', function (data) {
+    log('root received data from child ' + channel.id + ': ' + String(data))
+  })
+
+  log('root sending ping to child ' + channel.id)
+  channel.send('ping')
+})

@@ -22,7 +22,8 @@
   "homepage": "https://github.com/elavoie/webrtc-tree-overlay#readme",
   "dependencies": {
     "debug": "^2.6.9",
-    "event-emitter": "^0.3.5"
+    "event-emitter": "^0.3.5",
+    "minimist": "^1.2.0"
   },
   "devDependencies": {
     "tape": "^4.10.1",
