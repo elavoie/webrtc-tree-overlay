@@ -2,11 +2,12 @@
 
 # webrtc-tree-overlay
 
-Dynamically maintain a tree overlay topology from nodes connected by WebRTC as
-they join and leave. Each node accepts a maximum number of new connections after which the newer connection requests are delegated to children.
+Dynamically maintains a tree overlay topology from nodes connected by WebRTC as
+they join and leave. Each node accepts a maximum number of new connections after 
+which the newer connection requests are delegated to children.
 
 Requires a publicly accessible server for bootstrapping the connections,
-provided by [webrtc-bootstrap-server](https://github.com/elavoie/webrtc-bootstrap-server).
+provided by [webrtc-bootstrap](https://github.com/elavoie/webrtc-bootstrap).
 
 # Usage
 

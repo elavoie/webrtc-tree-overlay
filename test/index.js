@@ -1,6 +1,6 @@
 var tape = require('tape')
 var Client = require('webrtc-bootstrap')
-var Server = require('webrtc-bootstrap-server')
+var Server = require('webrtc-bootstrap').Server
 var wrtc = require('wrtc')
 var Node = require('..')
 var debug = require('debug')
@@ -10,7 +10,10 @@ var port = 5000
 
 tape('Connection test', function (t) {
   t.timeoutAfter(5 * 1000 /* MS */)
-  var server = new Server(secret, 5000)
+  var server = new Server(secret, {
+    port: port,
+    timeout: 5000
+  })
   t.ok(server)
   var bootstrap = new Client('localhost:' + port)
   t.ok(bootstrap)
@@ -46,7 +49,10 @@ tape('Connection test', function (t) {
 
 tape('README example', function (t) {
   t.timeoutAfter(5 * 1000 /* MS */)
-  var server = new Server(secret, 5000)
+  var server = new Server(secret, {
+    port: port,
+    timeout: 5000
+  })
   t.ok(server)
   var bootstrap = new Client('localhost:' + port)
   t.ok(bootstrap)
@@ -93,7 +99,10 @@ tape('README example', function (t) {
 })
 
 tape('Maximum Degree Property', function (t) {
-  var server = new Server(secret, 5000)
+  var server = new Server(secret, {
+    port: port,
+    timeout: 5000
+  })
   t.ok(server)
   var bootstrap = new Client('localhost:' + port)
   t.ok(bootstrap)
