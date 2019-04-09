@@ -9,13 +9,15 @@ var secret = argv.secret ? argv.secret : 'SECRET'
 var host = argv.host ? argv.host : 'genet.herokuapp.com'  
 
 log('connecting to ' + host)
-var root = new Node(new Client(host), { peerOpts: { wrtc: wrtc } }).becomeRoot(secret)
+var root = new Node(new Client(host), { peerOpts: { wrtc: wrtc } }).becomeRoot(secret, function () {
+  log('connected to ' + host)
+})
 
 root.on('child-connect', function (channel) {
   log('root connected to child ' + channel.id)
 
   channel.on('data', function (data) {
-    log('root received data from child ' + channel.id + ': ' + String(data))
+    console.log('child ' + channel.id.slice(0,5) + ' connected from ' + String(data))
   })
 
   log('root sending ping to child ' + channel.id)

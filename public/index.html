@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: "Helvetica Neue", helvetica, arial;
+        padding: 15px;
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      ul li {
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+<body>
+  <h1>Genet: WebRTC Tree Overlay Server</h1>
+  <textarea cols=80 rows=40 id='log'>
+  </textarea>
+  <script src='browsernode.js'></script>
+  <script>
+    localStorage.debug = 'webrtc-tree-overlay*'
+    browsernode(location.host, location.hash.slice(1))
+  </script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 {
   "name": "webrtc-tree-overlay",
-  "version": "1.0.15",
+  "version": "1.1.0",
   "description": "Dynamically maintain a tree overlay with WebRTC",
   "main": "src/index.js",
   "scripts": {
+    "postinstall": "browserify src/browser.js -r -s browsernode -o public/browsernode.js;",
     "test": "tape test/index.js"
   },
   "repository": {
@@ -21,13 +22,14 @@
   },
   "homepage": "https://github.com/elavoie/webrtc-tree-overlay#readme",
   "dependencies": {
+    "browserify": "^16.2.3",
     "debug": "^2.6.9",
     "event-emitter": "^0.3.5",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
     "tape": "^4.10.1",
-    "webrtc-bootstrap": "^4.0.1",
+    "webrtc-bootstrap": "^4.1.0",
     "wrtc": "^0.3.7"
   }
 }

@@ -39,6 +39,27 @@ provided by [webrtc-bootstrap](https://github.com/elavoie/webrtc-bootstrap).
       channel.send('ping')        
     })
 
+# Example Application
+
+Server process:
+````
+  DEBUG='webrtc-tree-overlay*,webrtc-bootstrap*' bin/server
+````
+
+Root process:
+````
+  DEBUG='webrtc-tree-overlay*,webrtc-bootstrap*' bin/root --host localhost:5000
+````
+
+Node process(es):
+````
+  DEBUG='webrtc-tree-overlay*,webrtc-bootstrap*' bin/node --host localhost:5000 --origin nodejs_node
+````
+
+Browser process(s):
+````
+  open http://localhost:5000/#browser_node
+````
 
 # API
 
@@ -77,7 +98,7 @@ The maximum number of children and candidates that are kept. If a join request a
 
 The parent channel, null if the node has not joined yet or is the root.
 
-### Node.becomeRoot(secret)
+### Node.becomeRoot(secret[, cb])
 
 Become root (through the bootstrap client), after which the node will automatically handle join requests.
 

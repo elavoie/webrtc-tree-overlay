@@ -102,7 +102,7 @@ function Node (bootstrap, opts) {
 }
 EE(Node.prototype)
 
-Node.prototype.join = function () {
+Node.prototype.join = function (cb) {
   var self = this
 
   self._log('creating a peer connection with options:')
@@ -112,16 +112,18 @@ Node.prototype.join = function () {
     null,
     this.bootstrap.connect(null, {
       peerOpts: this.peerOpts,
-      cb: function () {
-        // Ignore boostrapping timeout, we use our own here
+      timeout: self._REQUEST_TIMEOUT_IN_MS,
+      cb: function (err) {
+        if (err) {
+          self._log('connection to parent failed')
+          self.parent.destroy()
+          self.parent = null
+          if (cb) { cb(err) }
+        } else {
+          if (cb) { cb(null) }
+        }
       }
     }))
-
-  var timeout = setTimeout(function () {
-    self._log('connection to parent failed')
-    self.parent.destroy()
-    self.parent = null
-  }, self._REQUEST_TIMEOUT_IN_MS)
 
   this.parent
     .on('join-request', this._handleJoinRequest.bind(this))
@@ -131,7 +133,7 @@ Node.prototype.join = function () {
     .on('connect', function () {
       self._log('connected to parent')
       self.emit('parent-connect', self.parent)
-      clearTimeout(timeout)
+      if (cb) { cb(null) }
     })
     .on('close', function () {
       self._log('parent closed')
@@ -310,7 +312,7 @@ Node.prototype._delegate = function (req) {
   }
 }
 
-Node.prototype.becomeRoot = function (secret) {
+Node.prototype.becomeRoot = function (secret, cb) {
   var self = this
   this.bootstrap.root(secret, function (req) {
     if (!req.type) {
@@ -319,6 +321,11 @@ Node.prototype.becomeRoot = function (secret) {
       throw new Error('Invalid request type')
     }
     self._handleJoinRequest(req)
+  }, function (err) {
+    if (err) {
+      self._log('connection to server failed')
+    }
+    if (cb) { return cb(err) }
   })
   return this
 }

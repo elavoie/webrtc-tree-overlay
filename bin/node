@@ -5,8 +5,8 @@ var Node = require('..')
 var debug = require('debug')
 var wrtc = require('wrtc')
 var log = debug('webrtc-tree-overlay:node')
-var secret = 'secret'
 var host = argv.host ? argv.host : 'genet.herokuapp.com'  
+var origin = argv.origin ? argv.origin : process.env.PWD
 
 log('connecting to ' + host)
 var node = new Node(new Client(host), { peerOpts: { wrtc: wrtc } }).join()
@@ -16,6 +16,6 @@ node.on('parent-connect', function (channel) {
 
   channel.on('data', function (data) {
     log('child received: ' + String(data))
-    channel.send('pong')
+    channel.send(origin)
   })
 })

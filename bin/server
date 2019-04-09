@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+var Server = require('webrtc-bootstrap').Server
+var path = require('path')
+
+var secret = process.env.SECRET  || 'SECRET'
+var port = process.env.PORT || 5000
+var publicDir = path.join(__dirname, '..', 'public') 
+
+console.log(publicDir)
+
+var server = new Server(secret, {
+  port: port,
+  public: publicDir
+})
