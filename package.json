@@ -1,6 +1,6 @@
 {
   "name": "webrtc-tree-overlay",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "Dynamically maintain a tree overlay with WebRTC",
   "main": "src/index.js",
   "scripts": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "browserify": "^16.2.3",
     "debug": "^2.6.9",
+    "electron-webrtc": "^0.3.0",
     "event-emitter": "^0.3.5",
     "minimist": "^1.2.0",
     "webrtc-bootstrap": "^4.1.2"

@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 var argv = require('minimist')(process.argv)
 var Client = require('webrtc-bootstrap')
+var electronWebRTC = require('electron-webrtc')
 var Node = require('..')
 var debug = require('debug')
 var log = debug('webrtc-tree-overlay:root')
-var wrtc = require('wrtc')
 var secret = argv.secret ? argv.secret : 'SECRET'
 var host = argv.host ? argv.host : 'genet.herokuapp.com'  
+
+if (argv['wrtc']) {
+  var wrtc = require('wrtc')
+} else { // including --electron-webrtc
+  var wrtc = electronWebRTC({ headless: false }) 
+}
 
 log('connecting to ' + host)
 var root = new Node(new Client(host), { peerOpts: { wrtc: wrtc } }).becomeRoot(secret, function () {
